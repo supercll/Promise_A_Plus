@@ -50,8 +50,17 @@ MyPromise.prototype.then = function (resolveFunc, rejectFunc) {
 };
 MyPromise.prototype.catch = function () { };
 
+
+MyPromise.resolve = function (value) {
+    return new MyPromise(function (resolve) {
+        resolve(value);
+    });
+};
+MyPromise.reject = function () { };
+
+
 var p1 = new MyPromise(function (resolve, reject) {
-    // resolve(10);
+    resolve(10);
     reject(20);
 });
 
