@@ -55,7 +55,11 @@ MyPromise.resolve = function (value) {
         resolve(value);
     });
 };
-MyPromise.reject = function () { };
+MyPromise.reject = function () {
+    return new MyPromise(function (reject) {
+        reject(reason);
+    });
+};
 
 
 var p1 = new MyPromise(function (resolve, reject) {
