@@ -8,8 +8,8 @@ function MyPromise(executor) {
     var _this = this;
     this.PromiseStatus = "pending";
     this.PromiseValue = undefined;
-    this.resolveFunc = null;
-    this.rejectFunc = null;
+    this.resolveFunc = Function.prototype;
+    this.rejectFunc = function () { };
 
     // 修改实例的状态和value，只有当前状态为pending时才能修改
     function change(status, value) {
@@ -49,7 +49,6 @@ MyPromise.prototype.then = function (resolveFunc, rejectFunc) {
     this.rejectFunc = rejectFunc;
 };
 MyPromise.prototype.catch = function () { };
-
 
 MyPromise.resolve = function (value) {
     return new MyPromise(function (resolve) {
