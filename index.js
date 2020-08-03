@@ -84,7 +84,7 @@ MyPromise.prototype.then = function (resolveFunc, rejectFunc) {
         };
     });
 };
-MyPromise.prototype.catch = function () {
+MyPromise.prototype.catch = function (rejectFunc) {
     return this.then(null, rejectFunc);
 };
 
@@ -99,22 +99,56 @@ MyPromise.reject = function (reason) {
     });
 };
 
+MyPromise.all = function (promiseArr) {
+    return new MyPromise(function (resolve, reject) {
+        var index = 0;  // 记录成功的个数
+        var values = [];    // 每一个成功的value
+        for (var i = 0; i < promiseArr.length; i++) {
+            // 利用闭包的方式保存循环的每一项索引
 
-var p1 = new MyPromise(function (resolve, reject) {
-    resolve(10);
-    // reject(20);
-});
+            (function (i) {
+                var item = promiseArr[i];
+                // 如果当前项不是Promise,直接算作成功
+                !(item instanceof MyPromise) ? item = MyPromise.resolve(item) : null;
+                item.then(function (value) {
+                    index++;
+                    values[i] = value;
+                    if (index >= promiseArr.length) {
+                        // 所有的实例都成功了
+                        resolve(values);
+                    }
+                }).catch(function (reason) {
+                    // 只要有一个失败，整体就是失败
+                    reject(reason);
+                });
+            })(i);
+        }
+    });
+};
 
-p1.then(function (value) {
-    console.log("OK1", value);
-    return MyPromise.reject(0); // 返回一个新Promise实例
-}, function (reason) {
-    console.log("NO1", reason);
-    return 1; // 返回一个数字
-}).then(function (value) {
-    console.log("OK2", value);
-}, function (reason) {
-    console.log("NO2", reason);
-});
 
-console.log(p1);
+function fn1() {
+    return MyPromise.resolve(1);
+}
+function fn2() {
+    return new MyPromise(function (resolve, reject) {
+        setTimeout(() => {
+            resolve(2);
+        }, 1000);
+    });
+}
+function fn3() {
+    return new MyPromise(function (resolve, reject) {
+        setTimeout(() => {
+            resolve(3);
+        }, 2000);
+    });
+}
+
+MyPromise.all([fn1(), fn2(), fn3()])
+    .then(function (values) {
+        console.log("OK", values);
+    })
+    .catch(function (reason) {
+        console.log("NO", reason);
+    });
