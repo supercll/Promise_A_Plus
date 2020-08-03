@@ -94,7 +94,7 @@ MyPromise.resolve = function (value) {
     });
 };
 MyPromise.reject = function (reason) {
-    return new MyPromise(function (reject) {
+    return new MyPromise(function (resolve, reject) {
         reject(reason);
     });
 };
